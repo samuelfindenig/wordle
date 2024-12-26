@@ -1,22 +1,22 @@
 
-var height = 6; 
-var width = 5; 
+var height = 6;
+var width = 5;
 
-var row = 0; 
-var col = 0; 
+var row = 0;
+var col = 0;
 
 var gameOver = false;
 var word = "SQUID";
 
 
-window.onload = function(){
+window.onload = function () {
     intialize();
 }
 
 
 function intialize() {
 
-    
+
     for (let r = 0; r < height; r++) {
         for (let c = 0; c < width; c++) {
             let tile = document.createElement("span");
@@ -28,11 +28,11 @@ function intialize() {
     }
 
 
-    
-    document.addEventListener("keyup", (e) => {
-        if (gameOver) return; 
 
-      
+    document.addEventListener("keyup", (e) => {
+        if (gameOver) return;
+
+
         if ("KeyA" <= e.code && e.code <= "KeyZ") {
             if (col < width) {
                 let currTile = document.getElementById(row.toString() + '-' + col.toString());
@@ -44,7 +44,7 @@ function intialize() {
         }
         else if (e.code == "Backspace") {
             if (0 < col && col <= width) {
-                col -=1;
+                col -= 1;
             }
             let currTile = document.getElementById(row.toString() + '-' + col.toString());
             currTile.innerText = "";
@@ -53,7 +53,7 @@ function intialize() {
         else if (e.code == "Enter") {
             update();
             row += 1;
-            col = 0; 
+            col = 0;
         }
 
 
@@ -68,24 +68,42 @@ function intialize() {
 
 function update() {
     let correct = 0;
-    for (let c = 0; c < width; c++) {
-        let currTile = document.getElementById(row.toString() + '-' + c.toString());
+    let letterCount = {};
+
+    for (let i = 0; i < word.length; i++) {
+        if (letterCount[word[i]])
+            letterCount++;
+        else
+            letterCount[word[i]] = 1;
+    }
+
+    for (let i = 0; i < width; i++) {
+        let currTile = document.getElementById(row.toString() + '-' + i.toString());
         let letter = currTile.innerText;
 
-        if (word[c] == letter) {
+        if (word[i] == letter) {
             currTile.classList.add("correct");
             correct += 1;
-        } 
-        else if (word.includes(letter)) {
-            currTile.classList.add("present");
-        } 
-        else {
-            currTile.classList.add("wrong");
+            letterCount[letter]--;
         }
-
         if (correct == width) {
             gameOver = true;
         }
 
+    }
+
+
+    for (let i = 0; i < width; i++) {
+        let currTile = document.getElementById(row.toString() + '-' + i.toString());
+        let letter = currTile.innerText;
+        if (!currTile.classList.contains("correct")) {
+            if (word.includes(letter) && letterCount[letter] > 0) {
+                currTile.classList.add("present");
+                letterCount[letter]--;
+            }
+            else {
+                currTile.classList.add("wrong");
+            }
+        }
     }
 }
